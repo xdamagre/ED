@@ -126,9 +126,17 @@
   .question-header {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px 20px;
+    gap: 12px;
+    padding: 14px 20px;
     border-bottom: 1px solid var(--black);
+  }
+
+  .q-header-main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
   }
 
   .q-number {
@@ -137,6 +145,7 @@
     color: var(--gray-400);
     letter-spacing: 0.05em;
     min-width: 40px;
+    flex-shrink: 0;
   }
 
   .q-text {
@@ -144,6 +153,7 @@
     font-weight: 500;
     line-height: 1.35;
     flex: 1;
+    min-width: 0;
   }
 
   .q-image-wrap {
@@ -260,34 +270,37 @@
     line-height: 1.45;
   }
 
-  /* NAV */
+  /* NAV — arrow buttons flush with card border */
   .nav {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border-top: 1px solid var(--black);
+    display: flex;
+    flex-shrink: 0;
+    align-self: stretch;
+    /* cancel out header padding so buttons touch card edges */
+    margin: -14px -20px -14px 16px;
   }
 
   .nav-btn {
-    padding: 14px 20px;
-    background: none;
+    width: 48px;
+    background: var(--white);
     border: none;
+    border-left: 1px solid var(--black);
     cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--gray-400);
-    transition: all 0.12s;
+    transition: background 0.12s;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
   }
 
-  .nav-btn:first-child { border-right: 1px solid var(--black); }
-  .nav-btn:hover:not(:disabled) { background: var(--black); color: var(--white); }
-  .nav-btn:disabled { opacity: 0.25; cursor: default; }
-  .nav-btn.primary { background: var(--black); color: var(--white); }
-  .nav-btn.primary:hover { background: var(--gray-600); }
+  .nav-btn svg { display: block; pointer-events: none; }
+  .nav-btn:hover:not(:disabled) { background: var(--gray-100); }
+  .nav-btn:disabled { display: none; }
+  .nav-btn.primary { background: var(--black); }
+  .nav-btn.primary svg line,
+  .nav-btn.primary svg polyline,
+  .nav-btn.primary svg path { stroke: var(--white); }
+  .nav-btn.primary:hover:not(:disabled) { background: var(--gray-600); }
 
   /* MINI MAP */
   .minimap {
@@ -579,8 +592,24 @@
   <!-- QUESTION -->
   <div class="question-card" id="q-card">
     <div class="question-header">
-      <span class="q-number" id="q-num">01 / 50</span>
-      <span class="q-text" id="q-text"></span>
+      <div class="q-header-main">
+        <span class="q-number" id="q-num">01 / 50</span>
+        <span class="q-text" id="q-text"></span>
+      </div>
+      <div class="nav">
+        <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" disabled>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="16" y1="10" x2="3" y2="10" stroke="#0a0a0a" stroke-width="1.5" stroke-linecap="square"/>
+            <polyline points="8,4 3,10 8,16" stroke="#0a0a0a" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" fill="none"/>
+          </svg>
+        </button>
+        <button class="nav-btn primary" id="btn-next" onclick="navigate(1)">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="4" y1="10" x2="17" y2="10" stroke="white" stroke-width="1.5" stroke-linecap="square"/>
+            <polyline points="12,4 17,10 12,16" stroke="white" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" fill="none"/>
+          </svg>
+        </button>
+      </div>
     </div>
     <div class="q-image-wrap" id="q-img-wrap" style="display:none;">
       <img class="q-image" id="q-img" src="" alt="">
@@ -590,10 +619,6 @@
     <div class="feedback" id="feedback">
       <span class="feedback-icon" id="fb-icon"></span>
       <span class="feedback-text" id="fb-text"></span>
-    </div>
-    <div class="nav">
-      <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" disabled>← Anterior</button>
-      <button class="nav-btn primary" id="btn-next" onclick="navigate(1)">Següent →</button>
     </div>
   </div>
 
@@ -2404,21 +2429,31 @@ function renderQuestion() {
     fb.className = 'feedback';
   }
 
-  document.getElementById('btn-prev').disabled = current === 0;
+  const prevBtn = document.getElementById('btn-prev');
+  // Hide completely on first question, show otherwise
+  prevBtn.disabled = (current === 0);
+
+  const SVG_NEXT = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="4" y1="10" x2="17" y2="10" stroke="white" stroke-width="1.5" stroke-linecap="square"/><polyline points="12,4 17,10 12,16" stroke="white" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" fill="none"/></svg>`;
+  // End symbol: → with vertical bar (⊣ style)
+  const SVG_END  = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="4" y1="10" x2="14" y2="10" stroke="white" stroke-width="1.5" stroke-linecap="square"/><polyline points="10,4 15,10 10,16" stroke="white" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" fill="none"/><line x1="16" y1="4" x2="16" y2="16" stroke="white" stroke-width="1.5" stroke-linecap="square"/></svg>`;
 
   const allAnswered = answered.every(Boolean);
   const nextBtn = document.getElementById('btn-next');
   if (current === QUESTIONS.length - 1 && allAnswered) {
-    nextBtn.textContent = 'Veure resultats →';
+    nextBtn.innerHTML = SVG_END;
+    nextBtn.title = 'Veure resultats';
     nextBtn.onclick = showResults;
     nextBtn.className = 'nav-btn primary';
     nextBtn.disabled = false;
   } else if (current === QUESTIONS.length - 1) {
-    nextBtn.textContent = 'Última pregunta';
+    nextBtn.innerHTML = SVG_NEXT;
+    nextBtn.title = 'Última pregunta';
     nextBtn.disabled = true;
     nextBtn.onclick = null;
+    nextBtn.className = 'nav-btn primary';
   } else {
-    nextBtn.textContent = 'Següent →';
+    nextBtn.innerHTML = SVG_NEXT;
+    nextBtn.title = 'Següent';
     nextBtn.disabled = false;
     nextBtn.onclick = () => navigate(1);
     nextBtn.className = 'nav-btn primary';
