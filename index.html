@@ -40,6 +40,7 @@
     inset: 0;
     background-image: radial-gradient(circle, #b8b7b2 1px, transparent 1px);
     background-size: 28px 28px;
+    background-position: calc(50% - 356px) 16px;
     pointer-events: none;
     z-index: 0;
     opacity: 0.5;
@@ -50,17 +51,17 @@
     z-index: 1;
     max-width: 760px;
     margin: 0 auto;
-    padding: 0 24px 80px;
+    padding: 0 24px 48px;
   }
 
   /* HEADER */
   header {
-    border-bottom: 2px solid var(--black);
-    padding: 32px 0 20px;
-    margin-bottom: 32px;
+    border-bottom: 1px solid var(--black);
+    padding: 16px 0;
+    margin-bottom: 0;
     display: grid;
     grid-template-columns: 1fr auto;
-    align-items: end;
+    align-items: center;
     gap: 16px;
   }
 
@@ -70,11 +71,11 @@
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--gray-400);
-    margin-bottom: 6px;
+    margin-bottom: 3px;
   }
 
   header h1 {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 500;
     letter-spacing: -0.02em;
     line-height: 1.1;
@@ -86,7 +87,7 @@
     grid-template-columns: repeat(5, 1fr);
     border: 1px solid var(--black);
     background: var(--white);
-    margin-bottom: 32px;
+    margin-bottom: 0;
   }
 
   .score-cell {
@@ -116,6 +117,12 @@
   .score-val.wrong   { color: var(--red); }
   .score-val.pct     { color: var(--black); }
 
+  /* HEADER NAV BACK BUTTON */
+  header .nav {
+    margin: -14px 0px -14px 16px;
+    align-self: stretch;
+  }
+
   /* QUESTION CARD */
   .question-card {
     background: var(--white);
@@ -134,7 +141,7 @@
   .q-header-main {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 0;
     flex: 1;
     min-width: 0;
   }
@@ -142,10 +149,16 @@
   .q-number {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
-    color: var(--gray-400);
+    color: var(--black);
     letter-spacing: 0.05em;
-    min-width: 40px;
     flex-shrink: 0;
+    width: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    border-right: 1px solid var(--gray-200);
+    margin: -14px 0 -14px -20px;
   }
 
   .q-text {
@@ -154,11 +167,12 @@
     line-height: 1.35;
     flex: 1;
     min-width: 0;
+    padding-left: 16px;
   }
 
   .q-image-wrap {
     padding: 16px 20px;
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid var(--black);
   }
 
   .q-image {
@@ -179,22 +193,23 @@
 
   /* OPTIONS */
   .options {
-    padding: 8px 0;
+    padding: 0;
   }
 
   .option-btn {
     width: 100%;
     background: none;
     border: none;
-    border-bottom: 1px solid var(--gray-100);
-    padding: 14px 20px;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0;
     display: grid;
-    grid-template-columns: 28px 1fr;
-    align-items: center;
-    gap: 12px;
+    grid-template-columns: 46px 1fr;
+    align-items: stretch;
+    gap: 0;
     cursor: pointer;
     transition: background 0.12s;
     text-align: left;
+    min-height: 44px;
   }
 
   .option-btn:last-child { border-bottom: none; }
@@ -206,26 +221,30 @@
     font-size: 11px;
     font-weight: 500;
     color: var(--gray-400);
-    width: 22px;
-    height: 22px;
-    border: 1px solid var(--gray-200);
+    border-right: 1px solid var(--gray-200);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.12s;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+    flex-shrink: 0;
+    align-self: stretch;
   }
 
   .opt-text {
     font-size: 14px;
     color: var(--black);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
   }
 
-  /* States */
+  /* States — full square fill */
   .option-btn.correct-ans .opt-letter {
     background: var(--green);
     border-color: var(--green);
     color: #fff;
   }
+  .option-btn.correct-ans { background: color-mix(in srgb, var(--green) 8%, var(--white)); }
   .option-btn.correct-ans .opt-text { color: var(--green); font-weight: 500; }
 
   .option-btn.wrong-ans .opt-letter {
@@ -233,10 +252,11 @@
     border-color: var(--red);
     color: #fff;
   }
+  .option-btn.wrong-ans { background: color-mix(in srgb, var(--red) 8%, var(--white)); }
   .option-btn.wrong-ans .opt-text { color: var(--red); }
 
   .option-btn.reveal-correct .opt-letter {
-    border-color: var(--green);
+    border-right-color: var(--green);
     color: var(--green);
   }
   .option-btn.reveal-correct .opt-text { color: var(--green); }
@@ -281,6 +301,7 @@
 
   .nav-btn {
     width: 48px;
+    height: 48px;
     background: var(--white);
     border: none;
     border-left: 1px solid var(--black);
@@ -302,27 +323,51 @@
   .nav-btn.primary svg path { stroke: var(--white); }
   .nav-btn.primary:hover:not(:disabled) { background: var(--gray-600); }
 
-  /* MINI MAP */
+  /* PROGRESS BAR */
   .minimap {
-    margin-bottom: 24px;
+    margin-bottom: 0;
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
+    width: 100%;
+    height: 12px;
+    border: 1px solid var(--black);
+    overflow: visible;
+    position: relative;
   }
 
   .mm-dot {
-    width: 10px;
-    height: 10px;
-    border: 1px solid var(--gray-200);
+    flex: 1;
+    height: 100%;
     background: var(--white);
     cursor: pointer;
-    transition: all 0.1s;
+    position: relative;
   }
 
-  .mm-dot.answered-ok  { background: var(--green); border-color: var(--green); }
-  .mm-dot.answered-err { background: var(--red);   border-color: var(--red); }
-  .mm-dot.current      { border-color: var(--black); border-width: 2px; }
-  .mm-dot:hover        { transform: scale(1.4); }
+  /* tick: vertical line that doesn't touch top/bottom borders */
+  .mm-dot::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--black);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .mm-dot:last-child::after { display: none; }
+
+  .mm-dot.answered-ok  { background: var(--green); }
+  .mm-dot.answered-err { background: var(--red); }
+  /* current segment: outline cap a fora sense clipar */
+  .mm-dot.current      { z-index: 10; }
+  .mm-dot.current::before {
+    content: '';
+    position: absolute;
+    inset: -2px 0;
+    border: 2px solid var(--black);
+    pointer-events: none;
+    z-index: 10;
+  }
 
   /* RESULTS PAGE */
   #results-panel {
@@ -431,7 +476,8 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
+    margin-top: 24px;
   }
 
   .mode-btn {
@@ -507,16 +553,15 @@
 
   <!-- MODE SELECTION SCREEN -->
   <div id="mode-screen">
-    <div class="mode-title" style="display:grid;grid-template-columns:1fr auto;align-items:end;gap:16px;">
+    <header>
       <div>
         <div class="header-label">Parcial — Estètica i Disseny</div>
-        <h1 style="font-size:22px;font-weight:500;letter-spacing:-0.02em;margin-top:6px;">Tria el mode<br>de pràctica</h1>
+        <h1>Tria el mode<br>de pràctica</h1>
       </div>
-      <div style="text-align:right;padding-bottom:4px;">
-        <div class="header-label">Crèdits:</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;">David Martínez Gregorio</div>
+      <div style="text-align:right;">
+        <div class="header-label">David Martínez Gregorio</div>
       </div>
-    </div>
+    </header>
 
     <div class="mode-grid">
       <button class="mode-btn" onclick="startQuiz(10)">
@@ -550,15 +595,19 @@
   </div>
 
   <!-- QUIZ AREA -->
-  <div id="quiz-area" style="display:none;">
+  <div id="quiz-area" style="display:none;flex-direction:column;gap:24px;">
   <header>
     <div>
-      <div class="header-label">Parcial — Estètica i Disseny</div>
-      <h1>Questionari<br>de preparació</h1>
+      <h1>Questionari de preparació</h1>
     </div>
-    <div style="text-align:right;">
-      <div class="header-label">David Martínez Gregorio</div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:500;" id="header-total">— / 187</div>
+    <div class="nav">
+      <button class="nav-btn" onclick="goToModeSelect()" title="Tornar a l'inici">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="16" y1="10" x2="3" y2="10" stroke="#0a0a0a" stroke-width="1.5" stroke-linecap="square"/>
+          <polyline points="8,4 3,10 8,16" stroke="#0a0a0a" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" fill="none"/>
+          <line x1="3" y1="4" x2="3" y2="16" stroke="#0a0a0a" stroke-width="1.5" stroke-linecap="square"/>
+        </svg>
+      </button>
     </div>
   </header>
 
@@ -2330,8 +2379,7 @@ function startQuiz(size) {
   answered = new Array(QUESTIONS.length).fill(false);
 
   document.getElementById('mode-screen').style.display = 'none';
-  document.getElementById('quiz-area').style.display = 'block';
-  document.getElementById('header-total').textContent = size + ' / ' + ALL_QUESTIONS.length;
+  document.getElementById('quiz-area').style.display = 'flex';
 
   buildMinimap();
   renderQuestion();
@@ -2373,8 +2421,7 @@ function updateMinimap() {
 
 function renderQuestion() {
   const q = QUESTIONS[current];
-  document.getElementById('q-num').textContent =
-    String(current+1).padStart(2,'0') + ' / ' + QUESTIONS.length;
+  document.getElementById('q-num').textContent = (current+1) + '.';
   document.getElementById('q-text').textContent = q.text;
 
   const imgWrap = document.getElementById('q-img-wrap');
@@ -2421,9 +2468,10 @@ function renderQuestion() {
   if (answered[current]) {
     const ok = answers[current] === q.correct;
     fb.className = 'feedback show';
-    document.getElementById('fb-icon').textContent = ok ? 'OK' : 'NO';
-    document.getElementById('fb-icon').className = 'feedback-icon ' + (ok ? 'ok' : 'err');
-    document.getElementById('fb-text').textContent =
+    const fbIcon = document.getElementById('fb-icon');
+    const fbText = document.getElementById('fb-text');
+    if (fbIcon) { fbIcon.textContent = ok ? 'OK' : 'NO'; fbIcon.className = 'feedback-icon ' + (ok ? 'ok' : 'err'); }
+    if (fbText) document.getElementById('fb-text').textContent =
       (ok ? 'Correcte. ' : 'Incorrecte. La resposta correcta és "' + q.options[q.correct] + '". ') + q.explanation;
   } else {
     fb.className = 'feedback';
