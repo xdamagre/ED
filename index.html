@@ -171,8 +171,12 @@
   }
 
   .q-image-wrap {
-    padding: 16px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
     border-bottom: 1px solid var(--black);
+    gap: 12px;
+    align-items: flex-end;
   }
 
   .q-image {
@@ -181,14 +185,17 @@
     display: block;
     border: 1px solid var(--gray-200);
     filter: grayscale(20%);
+    margin: 0;
+    flex-shrink: 0;
   }
 
   .q-caption {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
     color: var(--gray-400);
-    margin-top: 8px;
     letter-spacing: 0.03em;
+    margin-left: auto;
+    padding: 0 20px 20px 0;
   }
 
   /* OPTIONS */
