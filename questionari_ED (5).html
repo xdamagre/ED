@@ -1,0 +1,2078 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionari — Història del Disseny</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f4f0;
+    --gray-100: #e8e7e3;
+    --gray-200: #c8c7c2;
+    --gray-400: #888882;
+    --gray-600: #4a4a47;
+    --red: #c8291a;
+    --green: #1a7a3a;
+    --blue: #1a3a7a;
+    --accent: #c8291a;
+    --grid: 8px;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* DOT GRID BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, #b8b7b2 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 2px solid var(--black);
+    padding: 32px 0 20px;
+    margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 16px;
+  }
+
+  .header-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 6px;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  /* SCOREBOARD */
+  .scoreboard {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border: 1px solid var(--black);
+    background: var(--white);
+    margin-bottom: 32px;
+  }
+
+  .score-cell {
+    padding: 14px 16px;
+    border-right: 1px solid var(--black);
+    text-align: center;
+  }
+  .score-cell:last-child { border-right: none; }
+
+  .score-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 4px;
+  }
+
+  .score-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .score-val.correct { color: var(--green); }
+  .score-val.wrong   { color: var(--red); }
+  .score-val.pct     { color: var(--black); }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: var(--white);
+    border: 1px solid var(--black);
+    margin-bottom: 0;
+  }
+
+  .question-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--black);
+  }
+
+  .q-number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--gray-400);
+    letter-spacing: 0.05em;
+    min-width: 40px;
+  }
+
+  .q-text {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
+    flex: 1;
+  }
+
+  .q-image-wrap {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .q-image {
+    max-width: 280px;
+    max-height: 200px;
+    display: block;
+    border: 1px solid var(--gray-200);
+    filter: grayscale(20%);
+  }
+
+  .q-caption {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--gray-400);
+    margin-top: 8px;
+    letter-spacing: 0.03em;
+  }
+
+  /* OPTIONS */
+  .options {
+    padding: 8px 0;
+  }
+
+  .option-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--gray-100);
+    padding: 14px 20px;
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.12s;
+    text-align: left;
+  }
+
+  .option-btn:last-child { border-bottom: none; }
+  .option-btn:hover:not(:disabled) { background: var(--gray-100); }
+  .option-btn:disabled { cursor: default; }
+
+  .opt-letter {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray-400);
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.12s;
+  }
+
+  .opt-text {
+    font-size: 14px;
+    color: var(--black);
+  }
+
+  /* States */
+  .option-btn.correct-ans .opt-letter {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+  .option-btn.correct-ans .opt-text { color: var(--green); font-weight: 500; }
+
+  .option-btn.wrong-ans .opt-letter {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+  }
+  .option-btn.wrong-ans .opt-text { color: var(--red); }
+
+  .option-btn.reveal-correct .opt-letter {
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .option-btn.reveal-correct .opt-text { color: var(--green); }
+
+  /* FEEDBACK */
+  .feedback {
+    display: none;
+    padding: 12px 20px;
+    border-top: 1px solid var(--black);
+    background: var(--gray-100);
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .feedback.show { display: flex; }
+
+  .feedback-icon {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 6px;
+    flex-shrink: 0;
+  }
+
+  .feedback-icon.ok  { background: var(--green); color: #fff; }
+  .feedback-icon.err { background: var(--red); color: #fff; }
+
+  .feedback-text {
+    font-size: 13px;
+    color: var(--gray-600);
+    line-height: 1.45;
+  }
+
+  /* NAV */
+  .nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--black);
+  }
+
+  .nav-btn {
+    padding: 14px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-btn:first-child { border-right: 1px solid var(--black); }
+  .nav-btn:hover:not(:disabled) { background: var(--black); color: var(--white); }
+  .nav-btn:disabled { opacity: 0.25; cursor: default; }
+  .nav-btn.primary { background: var(--black); color: var(--white); }
+  .nav-btn.primary:hover { background: var(--gray-600); }
+
+  /* MINI MAP */
+  .minimap {
+    margin-bottom: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .mm-dot {
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--gray-200);
+    background: var(--white);
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+
+  .mm-dot.answered-ok  { background: var(--green); border-color: var(--green); }
+  .mm-dot.answered-err { background: var(--red);   border-color: var(--red); }
+  .mm-dot.current      { border-color: var(--black); border-width: 2px; }
+  .mm-dot:hover        { transform: scale(1.4); }
+
+  /* RESULTS PAGE */
+  #results-panel {
+    display: none;
+  }
+  #results-panel.show { display: block; }
+
+  .res-header {
+    border-bottom: 2px solid var(--black);
+    padding: 32px 0 20px;
+    margin-bottom: 32px;
+  }
+
+  .res-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--black);
+    margin-bottom: 24px;
+    background: var(--black);
+    gap: 1px;
+  }
+
+  .res-big-cell {
+    background: var(--white);
+    padding: 20px 20px;
+    text-align: center;
+  }
+
+  .res-big-cell .score-val {
+    font-size: 36px;
+  }
+
+  .res-grade-box {
+    border-left: 3px solid var(--black);
+    padding: 12px 16px;
+    margin-bottom: 32px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  /* WRONG REVIEW */
+  .res-review {
+    border-top: 1px solid var(--gray-200);
+    padding-top: 24px;
+  }
+
+  .res-review-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 16px;
+  }
+
+  .review-item {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-100);
+    align-items: start;
+  }
+
+  .review-item:last-child { border-bottom: none; }
+
+  .review-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--gray-400);
+    padding-top: 2px;
+  }
+
+  .review-q { font-size: 13px; color: var(--gray-600); margin-bottom: 4px; }
+  .review-ans { font-size: 13px; font-weight: 500; }
+  .review-ans span { color: var(--green); }
+
+  .restart-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 32px;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    transition: background 0.12s;
+    margin-right: 12px;
+  }
+  .restart-btn:hover { background: var(--gray-600); }
+
+  /* MODE SELECTION SCREEN */
+  #mode-screen {
+    display: block;
+  }
+  #mode-screen.hidden { display: none; }
+
+  .mode-title {
+    border-bottom: 2px solid var(--black);
+    padding: 32px 0 20px;
+    margin-bottom: 40px;
+  }
+
+  .mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .mode-btn {
+    border: 1px solid var(--black);
+    background: var(--white);
+    padding: 24px 20px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.12s;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mode-btn:hover {
+    background: var(--black);
+    color: var(--white);
+  }
+
+  .mode-btn:hover .mode-sub { color: var(--gray-200); }
+
+  .mode-btn.exam {
+    border-color: var(--black);
+    border-width: 2px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .mode-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 36px;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .mode-label {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .mode-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--gray-400);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .mode-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--black);
+    color: var(--white);
+    padding: 3px 8px;
+  }
+
+  .mode-btn.exam:hover .mode-badge {
+    background: var(--white);
+    color: var(--black);
+  }
+
+  #quiz-area { display: none; }
+  #quiz-area.visible { display: block; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- MODE SELECTION SCREEN -->
+  <div id="mode-screen">
+    <div class="mode-title" style="display:grid;grid-template-columns:1fr auto;align-items:end;gap:16px;">
+      <div>
+        <div class="header-label">Parcial — Estètica i Disseny</div>
+        <h1 style="font-size:22px;font-weight:500;letter-spacing:-0.02em;margin-top:6px;">Tria el mode<br>de pràctica</h1>
+      </div>
+      <div style="text-align:right;padding-bottom:4px;">
+        <div class="header-label">Estudiant</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;">David Martínez Gregorio</div>
+      </div>
+    </div>
+
+    <div class="mode-grid">
+      <button class="mode-btn" onclick="startQuiz(10)">
+        <div class="mode-num">10</div>
+        <div class="mode-label">Preguntes</div>
+        <div class="mode-sub">Repàs ràpid</div>
+      </button>
+      <button class="mode-btn" onclick="startQuiz(25)">
+        <div class="mode-num">25</div>
+        <div class="mode-label">Preguntes</div>
+        <div class="mode-sub">Sessió mitja</div>
+      </button>
+      <button class="mode-btn" onclick="startQuiz(50)">
+        <div class="mode-num">50</div>
+        <div class="mode-label">Preguntes</div>
+        <div class="mode-sub">Pràctica completa</div>
+      </button>
+      <button class="mode-btn exam" onclick="startQuiz(85)">
+        <div>
+          <div class="mode-num">85</div>
+          <div class="mode-label">Simulacre d'examen</div>
+          <div class="mode-sub">Format oficial · Penalització −0.5</div>
+        </div>
+        <div class="mode-badge">Exam</div>
+      </button>
+    </div>
+
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gray-400);letter-spacing:0.05em;">
+      Les preguntes i les respostes es barregen aleatòriament en cada sessió.
+    </p>
+  </div>
+
+  <!-- QUIZ AREA -->
+  <div id="quiz-area" style="display:none;">
+  <header>
+    <div>
+      <div class="header-label">Parcial — Estètica i Disseny</div>
+      <h1>Questionari<br>de preparació</h1>
+    </div>
+    <div style="text-align:right;">
+      <div class="header-label">David Martínez Gregorio</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:500;" id="header-total">— / 187</div>
+    </div>
+  </header>
+
+  <!-- MINIMAP -->
+  <div class="minimap" id="minimap"></div>
+
+  <!-- SCOREBOARD -->
+  <div class="scoreboard">
+    <div class="score-cell">
+      <div class="score-label">Correctes</div>
+      <div class="score-val correct" id="sc-ok">0</div>
+    </div>
+    <div class="score-cell">
+      <div class="score-label">Incorrectes</div>
+      <div class="score-val wrong" id="sc-err">0</div>
+    </div>
+    <div class="score-cell">
+      <div class="score-label">Restants</div>
+      <div class="score-val" id="sc-rem">50</div>
+    </div>
+    <div class="score-cell">
+      <div class="score-label">Encert</div>
+      <div class="score-val pct" id="sc-pct">—</div>
+    </div>
+    <div class="score-cell">
+      <div class="score-label">Nota /10</div>
+      <div class="score-val pct" id="sc-nota">—</div>
+    </div>
+  </div>
+
+  <!-- QUESTION -->
+  <div class="question-card" id="q-card">
+    <div class="question-header">
+      <span class="q-number" id="q-num">01 / 50</span>
+      <span class="q-text" id="q-text"></span>
+    </div>
+    <div class="q-image-wrap" id="q-img-wrap" style="display:none;">
+      <img class="q-image" id="q-img" src="" alt="">
+      <div class="q-caption" id="q-caption"></div>
+    </div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback">
+      <span class="feedback-icon" id="fb-icon"></span>
+      <span class="feedback-text" id="fb-text"></span>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" disabled>← Anterior</button>
+      <button class="nav-btn primary" id="btn-next" onclick="navigate(1)">Següent →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS PAGE -->
+  <div id="results-panel">
+    <div class="res-header">
+      <div class="header-label">Resultat final</div>
+      <h1 id="res-score" style="font-size:28px;font-weight:500;letter-spacing:-0.02em;margin-top:6px;">—</h1>
+    </div>
+
+    <div class="res-grid">
+      <div class="res-big-cell">
+        <div class="score-label">Correctes</div>
+        <div class="score-val correct" id="res-ok">—</div>
+      </div>
+      <div class="res-big-cell">
+        <div class="score-label">Incorrectes</div>
+        <div class="score-val wrong" id="res-err">—</div>
+      </div>
+      <div class="res-big-cell">
+        <div class="score-label">Punts bruts</div>
+        <div class="score-val" id="res-pts">—</div>
+      </div>
+    </div>
+
+    <div class="res-grade-box" id="res-grade-box">
+      <span id="res-grade"></span>
+    </div>
+
+    <div class="res-review" id="res-review"></div>
+
+    <div style="margin-top:32px;">
+      <button class="restart-btn" onclick="restart()">Tornar a intentar</button>
+      <button class="restart-btn" style="background:var(--gray-400);" onclick="goToModeSelect()">Canviar mode</button>
+    </div>
+  </div>
+  </div><!-- end quiz-area -->
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+  // ── BLOC 1: PREGUNTES AMB IMATGES (del primer PDF) ──────────────────────
+  {
+    text: "En quin moment es produeix la ruptura definitiva entre artesania i producció?",
+    options: ["Renaixement","Revolució Industrial","Barroc","Art Nouveau"],
+    correct: 1,
+    explanation: "La Revolució Industrial introdueix la mecanització i separa el productor del dissenyador."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Crystal_Palace_-_2004-01-24.jpg?width=600",
+    caption: "Crystal Palace — Joseph Paxton",
+    options: ["Neoclassicisme","Art Nouveau","Arquitectura industrial","Racionalisme"],
+    correct: 2,
+    explanation: "Estructura prefabricada de ferro i vidre; expressió directa de la tecnologia."
+  },
+  {
+    text: "Quin problema estètic apareix amb la producció en sèrie?",
+    options: ["Massa coherència","Falta d'ornament","Decoració superficial","Excés de funció"],
+    correct: 2,
+    explanation: "Ornament aplicat sense relació amb estructura o funció."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Jacques-Louis_David_-_Oath_of_the_Horatii_-_Google_Art_Project.jpg?width=600",
+    caption: "The Oath of the Horatii — Jacques-Louis David",
+    options: ["Romanticisme","Neoclassicisme","Simbolisme","Impressionisme"],
+    correct: 1,
+    explanation: "Composició simètrica, temàtica moral i control formal."
+  },
+  {
+    text: "Quin element conceptual uneix Ruskin i Morris?",
+    options: ["Defensa de la màquina","Valor ètic del treball artesanal","Abstracció","Geometria"],
+    correct: 1,
+    explanation: "Art i treball com a expressió moral."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Eug%C3%A8ne_Delacroix_-_La_libert%C3%A9_guidant_le_peuple.jpg?width=600",
+    caption: "Liberty Leading the People — Eugène Delacroix",
+    options: ["Neoclassicisme","Romanticisme","Realisme","Simbolisme"],
+    correct: 1,
+    explanation: "Dinamisme, emoció i composició diagonal."
+  },
+  {
+    text: "La figura de Christopher Dresser és rellevant perquè:",
+    options: ["Rebutja la indústria","Introduïx una estètica funcional","Defensa el simbolisme","Desenvolupa el cubisme"],
+    correct: 1,
+    explanation: "Primer dissenyador industrial amb criteri formal coherent."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/William_Morris_design_for_Strawberry_Thief_wallpaper,_1883.jpg?width=600",
+    caption: "Strawberry Thief — William Morris",
+    options: ["Art Nouveau","Arts & Crafts","Simbolisme","Neoclassicisme"],
+    correct: 1,
+    explanation: "Producció artesanal i inspiració natural repetitiva."
+  },
+  {
+    text: "Quin element marca la diferència entre Art Nouveau i Arts & Crafts?",
+    options: ["Inspiració natural","Integració amb la indústria","Ús de color","Ornament"],
+    correct: 1,
+    explanation: "L'Art Nouveau intenta dialogar amb la producció industrial."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/CasaBatllo20060818.jpg?width=600",
+    caption: "Casa Batlló — Antoni Gaudí",
+    options: ["Racionalisme","Art Nouveau / Modernisme","Neoclassicisme","Escola de Chicago"],
+    correct: 1,
+    explanation: "Formes orgàniques i integració total de decoració."
+  },
+  {
+    text: "Quina afirmació és correcta sobre el japonisme?",
+    options: ["Rebutja la línia","Influència nul·la a Europa","Introduïx simplificació formal","Defensa el naturalisme extrem"],
+    correct: 2,
+    explanation: "Influeix en la bidimensionalitat i composició."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Aubrey_Beardsley_-_Salome_-_The_Climax.jpg?width=600",
+    caption: "Salomé Illustration — Aubrey Beardsley",
+    options: ["Simbolisme","Art Nouveau","Expressionisme","Futurisme"],
+    correct: 1,
+    explanation: "Línia sinuosa i estilització extrema."
+  },
+  {
+    text: "Quin element defineix millor la Secessió Vienesa?",
+    options: ["Ornament orgànic","Geometria decorativa","Expressionisme","Minimalisme"],
+    correct: 1,
+    explanation: "Transició cap a formes més estructurades."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg?width=600",
+    caption: "The Kiss — Gustav Klimt",
+    options: ["Art Nouveau","Secessió Vienesa","Simbolisme","Expressionisme"],
+    correct: 1,
+    explanation: "Ornament geomètric i superfície plana decorativa."
+  },
+  {
+    text: "El Werkbund pretén:",
+    options: ["Eliminar la indústria","Unificar art i indústria","Tornar a l'artesania","Fer art abstracte"],
+    correct: 1,
+    explanation: "Base del disseny modern."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/AEG-Turbinenfabrik.jpg?width=600",
+    caption: "AEG Turbine Factory — Peter Behrens",
+    options: ["Art Nouveau","Werkbund","Neoclassicisme","Futurisme"],
+    correct: 1,
+    explanation: "Integració de funció industrial i forma arquitectònica."
+  },
+  {
+    text: "Quin canvi implica Adolf Loos?",
+    options: ["Més ornament","Ornament com a delicte","Retorn al gòtic","Color simbòlic"],
+    correct: 1,
+    explanation: "Rebuig radical de decoració superflua."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Looshaus_Michaelerplatz_2011.jpg?width=600",
+    caption: "Looshaus — Adolf Loos",
+    options: ["Art Nouveau","Racionalisme inicial","Historicisme","Simbolisme"],
+    correct: 1,
+    explanation: "Supressió d'ornament i primacia de funció."
+  },
+  {
+    text: "Quin moviment defensa que la forma segueix la funció?",
+    options: ["Romanticisme","Racionalisme","Simbolisme","Fauvisme"],
+    correct: 1,
+    explanation: "Màxima del racionalisme: form follows function."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Piet_Mondriaan,_1930_-_Mondrian_Composition_II_in_Red,_Blue,_and_Yellow.jpg?width=600",
+    caption: "Composition with Red, Blue and Yellow — Piet Mondrian",
+    options: ["Constructivisme","Neoplasticisme","Cubisme","Expressionisme"],
+    correct: 1,
+    explanation: "Abstracció total i ús de colors primaris."
+  },
+  {
+    text: "Quin moviment utilitza el collage com a crítica?",
+    options: ["Futurisme","Dadaisme","Neoclassicisme","Art Nouveau"],
+    correct: 1,
+    explanation: "El Dadaisme empra el collage com a eina de subversió."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Duchamp_Fountaine.jpg?width=600",
+    caption: "Fountain — Marcel Duchamp",
+    options: ["Surrealisme","Dadaisme","Constructivisme","Cubisme"],
+    correct: 1,
+    explanation: "Descontextualització i crítica institucional."
+  },
+  {
+    text: "Quin moviment busca representar l'inconscient?",
+    options: ["Expressionisme","Surrealisme","Fauvisme","Constructivisme"],
+    correct: 1,
+    explanation: "El Surrealisme explora l'inconscient i el somni."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/The_Persistence_of_Memory.jpg?width=600",
+    caption: "The Persistence of Memory — Salvador Dalí",
+    options: ["Simbolisme","Surrealisme","Expressionisme","Cubisme"],
+    correct: 1,
+    explanation: "Imatges il·lògiques amb execució precisa."
+  },
+  {
+    text: "Quin moviment concep l'art com a eina social revolucionària?",
+    options: ["Neoplasticisme","Constructivisme","Impressionisme","Romanticisme"],
+    correct: 1,
+    explanation: "El Constructivisme posa l'art al servei de la revolució social."
+  },
+  {
+    text: "Quin canvi introdueix la Revolució Industrial en el procés de disseny?",
+    options: ["Unificació entre artesà i productor","Separació entre concepció i execució","Eliminació de la tecnologia","Retorn al classicisme"],
+    correct: 1,
+    explanation: "El dissenyador es desvincula del procés productiu."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Eiffel_tower_at_sunrise_from_Champ_de_Mars_in_Paris,_August_2011.jpg?width=480",
+    caption: "Torre Eiffel — Gustave Eiffel",
+    options: ["Neoclassicisme","Arquitectura industrial","Art Nouveau","Racionalisme"],
+    correct: 1,
+    explanation: "Expressió directa de l'estructura metàl·lica com a forma."
+  },
+  {
+    text: "Quin moviment reacciona contra la industrialització des d'una posició moral?",
+    options: ["Futurisme","Arts & Crafts","Constructivisme","Cubisme"],
+    correct: 1,
+    explanation: "Arts & Crafts considera la indústria una degradació del treball."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg?width=480",
+    caption: "Wanderer above the Sea of Fog — Caspar David Friedrich",
+    options: ["Romanticisme","Neoclassicisme","Impressionisme","Simbolisme"],
+    correct: 0,
+    explanation: "Exaltació de la natura i subjectivitat."
+  },
+  {
+    text: "Quin aspecte formal distingeix el Romanticisme del Neoclassicisme?",
+    options: ["Ús de línia recta","Composició simètrica","Dinamisme i tensió","Absència de color"],
+    correct: 2,
+    explanation: "El Romanticisme introdueix composicions dinàmiques i tensió emocional."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Paul_C%C3%A9zanne_-_Mont_Sainte-Victoire_and_the_Viaduct_of_the_Arc_River_Valley_(Metropolitan_Museum_of_Art).jpg?width=600",
+    caption: "Mont Sainte-Victoire — Paul Cézanne",
+    options: ["Impressionisme","Postimpressionisme","Cubisme","Fauvisme"],
+    correct: 1,
+    explanation: "Construcció estructural del paisatge."
+  },
+  {
+    text: "Quin moviment introdueix la idea que la pintura pot ser construïda?",
+    options: ["Impressionisme","Postimpressionisme","Simbolisme","Dadaisme"],
+    correct: 1,
+    explanation: "El Postimpressionisme, especialment Cézanne, veu la pintura com a construcció."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Andre_Derain,_1906,_Charing_Cross_Bridge,_London,_National_Gallery_of_Art,_Washington,_D.C..jpg?width=600",
+    caption: "Charing Cross Bridge — André Derain",
+    options: ["Expressionisme","Fauvisme","Cubisme","Simbolisme"],
+    correct: 1,
+    explanation: "Color com a element expressiu autònom."
+  },
+  {
+    text: "Quin element és més característic del Fauvisme?",
+    options: ["Geometria","Color no naturalista","Ornament","Simetria"],
+    correct: 1,
+    explanation: "El Fauvisme utilitza el color de manera expressiva, allunyada del natural."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Braque_-_Still_Life_with_Violin.jpg?width=600",
+    caption: "Still Life with Violin — Georges Braque",
+    options: ["Cubisme","Futurisme","Racionalisme","Simbolisme"],
+    correct: 0,
+    explanation: "Fragmentació i múltiples punts de vista."
+  },
+  {
+    text: "Quin moviment elimina la perspectiva tradicional?",
+    options: ["Neoclassicisme","Cubisme","Romanticisme","Arts & Crafts"],
+    correct: 1,
+    explanation: "El Cubisme fragmenta la realitat i elimina la perspectiva de punt de vista únic."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Giacomo_Balla,_1912,_Dynamism_of_a_Dog_on_a_Leash,_Albright-Knox_Art_Gallery.jpg?width=600",
+    caption: "Dynamism of a Dog on a Leash — Giacomo Balla",
+    options: ["Cubisme","Futurisme","Dadaisme","Expressionisme"],
+    correct: 1,
+    explanation: "Repetició per suggerir moviment."
+  },
+  {
+    text: "Quin moviment glorifica la velocitat i la guerra?",
+    options: ["Simbolisme","Futurisme","Neoplasticisme","Impressionisme"],
+    correct: 1,
+    explanation: "El Futurisme italià celebra la màquina, la velocitat i la guerra."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Hannah_H%C3%B6ch_Cut_with_the_Dada_Kitchen_Knife_1919.jpg?width=480",
+    caption: "Cut with the Kitchen Knife — Hannah Höch",
+    options: ["Surrealisme","Dadaisme","Constructivisme","Fauvisme"],
+    correct: 1,
+    explanation: "Collage com a crítica política i cultural."
+  },
+  {
+    text: "Quin moviment rebutja la idea d'art com a objecte estètic?",
+    options: ["Dadaisme","Simbolisme","Impressionisme","Art Nouveau"],
+    correct: 0,
+    explanation: "El Dadaisme deconstrueix el concepte mateix d'art."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rene_Magritte_-_The_Son_of_Man.jpg?width=480",
+    caption: "The Son of Man — René Magritte",
+    options: ["Simbolisme","Surrealisme","Expressionisme","Cubisme"],
+    correct: 1,
+    explanation: "Joc conceptual i realitat alterada."
+  },
+  {
+    text: "Quin moviment es centra en el subconscient?",
+    options: ["Surrealisme","Futurisme","Constructivisme","Neoclassicisme"],
+    correct: 0,
+    explanation: "El Surrealisme explora l'inconscient com a font creativa."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rietveld_chair_1.jpg?width=480",
+    caption: "Red Blue Chair — Gerrit Rietveld",
+    options: ["Constructivisme","Neoplasticisme","Racionalisme","Bauhaus"],
+    correct: 1,
+    explanation: "Reducció a estructura i color primari."
+  },
+  {
+    text: "Quin element defineix el Neoplasticisme?",
+    options: ["Ornament natural","Geometria ortogonal","Color simbòlic","Pinzellada solta"],
+    correct: 1,
+    explanation: "El Neoplasticisme es basa en línies ortogonals i colors primaris."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rodchenko_Poster.jpg?width=480",
+    caption: "Poster — Alexander Rodchenko",
+    options: ["Futurisme","Constructivisme","Dadaisme","Simbolisme"],
+    correct: 1,
+    explanation: "Geometria i funció comunicativa."
+  },
+  {
+    text: "Quin moviment utilitza l'art com a eina política?",
+    options: ["Impressionisme","Constructivisme","Fauvisme","Neoclassicisme"],
+    correct: 1,
+    explanation: "El Constructivisme soviètic subordina l'art a la causa revolucionària."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Looshaus_am_Michaelerplatz.jpg?width=480",
+    caption: "Interior Loos — Adolf Loos",
+    options: ["Art Nouveau","Racionalisme","Historicisme","Simbolisme"],
+    correct: 1,
+    explanation: "Funció i estructura espacial sense ornament."
+  },
+  {
+    text: "Quin moviment elimina completament l'ornament com a principi?",
+    options: ["Art Nouveau","Racionalisme","Simbolisme","Romanticisme"],
+    correct: 1,
+    explanation: "El Racionalisme estableix que l'ornament és superfluu."
+  },
+  {
+    text: "A quin moviment pertany la peça següent?",
+    image: "https://commons.wikimedia.org/wiki/Special:FilePath/Seagram_building.jpg?width=480",
+    caption: "Seagram Building — Mies van der Rohe",
+    options: ["Escola de Chicago","Racionalisme","Art Nouveau","Futurisme"],
+    correct: 1,
+    explanation: "Geometria pura i estructura visible."
+  },
+  {
+    text: "Quin moviment marca la consolidació del disseny modern?",
+    options: ["Romanticisme","Werkbund","Neoclassicisme","Simbolisme"],
+    correct: 1,
+    explanation: "El Werkbund unifica art i indústria, base del disseny modern."
+  },
+
+  // ── BLOC 2: PREGUNTES TEÒRIQUES (del segon PDF, sense duplicats) ──────────
+  {
+    text: "Quina és la diferència principal entre estètica i bellesa?",
+    options: ["L'estètica és objectiva i la bellesa subjectiva","L'estètica estudia la percepció i la bellesa és una qualitat percebuda","La bellesa només s'aplica a l'art","L'estètica només s'aplica al disseny"],
+    correct: 1,
+    explanation: "L'estètica és la disciplina que estudia la percepció; la bellesa és una qualitat percebuda."
+  },
+  {
+    text: "Segons el pensament clàssic, què defineix principalment la bellesa?",
+    options: ["L'originalitat","La funcionalitat","L'harmonia i proporció","L'expressivitat"],
+    correct: 2,
+    explanation: "El pensament clàssic associa bellesa amb harmonia i proporció."
+  },
+  {
+    text: "Quin paper té la percepció en l'estètica?",
+    options: ["No té importància","És secundària respecte la tècnica","És fonamental per interpretar la realitat","Només afecta l'art contemporani"],
+    correct: 2,
+    explanation: "La percepció és fonamental per interpretar la realitat estètica."
+  },
+  {
+    text: "Què significa que l'estètica és una disciplina filosòfica?",
+    options: ["Que només estudia artistes","Que analitza conceptes com bellesa, art i percepció","Que és una ciència exacta","Que només s'aplica a l'arquitectura"],
+    correct: 1,
+    explanation: "L'estètica com a disciplina filosòfica analitza conceptes com bellesa, art i percepció."
+  },
+  {
+    text: "Quin concepte relaciona forma i funció en el disseny?",
+    options: ["Decoració","Funcionalisme","Simbolisme","Romanticisme"],
+    correct: 1,
+    explanation: "El funcionalisme és el concepte que relaciona forma i funció en el disseny."
+  },
+  {
+    text: "Què caracteritza el neoclassicisme?",
+    options: ["Exageració decorativa","Retorn a la natura","Simplicitat i inspiració clàssica","Abstracció total"],
+    correct: 2,
+    explanation: "El neoclassicisme es caracteritza per la simplicitat i la inspiració en l'antiguitat clàssica."
+  },
+  {
+    text: "Quin moviment s'oposa al neoclassicisme amb una visió més emocional?",
+    options: ["Funcionalisme","Romanticisme","Cubisme","Bauhaus"],
+    correct: 1,
+    explanation: "El romanticisme s'oposa al neoclassicisme amb una visió emocional i subjectiva."
+  },
+  {
+    text: "Quin tret defineix el romanticisme?",
+    options: ["Objectivitat científica","Racionalitat extrema","Subjectivitat i emoció","Geometria pura"],
+    correct: 2,
+    explanation: "El romanticisme es defineix per la subjectivitat i l'emoció."
+  },
+  {
+    text: "Què representa l'obra El rai de la Medusa?",
+    options: ["Equilibri clàssic","Expressió emocional i drama","Geometria abstracta","Funcionalitat industrial"],
+    correct: 1,
+    explanation: "El rai de la Medusa de Géricault representa l'expressió emocional i el drama romàntic."
+  },
+  {
+    text: "Quin problema apareix amb la producció industrial del segle XIX?",
+    options: ["Massa qualitat","Falta d'innovació","Mal gust i imitació estilística","Escassetat de productes"],
+    correct: 2,
+    explanation: "La producció industrial del XIX genera mal gust i imitació estilística superficial."
+  },
+  {
+    text: "Què és el kitsch?",
+    options: ["Estil funcional","Producte d'alta qualitat","Imitació superficial i de mal gust","Estil clàssic pur"],
+    correct: 2,
+    explanation: "El kitsch és una imitació superficial i de mal gust dels estils cultes."
+  },
+  {
+    text: "Quin objectiu tenien les exposicions universals?",
+    options: ["Evitar la industrialització","Mostrar productes i innovacions","Promoure només l'art clàssic","Eliminar el comerç"],
+    correct: 1,
+    explanation: "Les exposicions universals servien per mostrar productes i innovacions industrials."
+  },
+  {
+    text: "Què denunciaven intel·lectuals després de l'exposició de 1851?",
+    options: ["Falta de tecnologia","Mal gust dels productes industrials","Excés de qualitat","Escassetat de producció"],
+    correct: 1,
+    explanation: "Intellectuals com Ruskin denunciaven el mal gust estètic dels productes industrials."
+  },
+  {
+    text: "Quin és el paper de la màquina en el segle XIX?",
+    options: ["Substitueix completament l'art","Permet la producció massiva","Elimina el disseny","Redueix el consum"],
+    correct: 1,
+    explanation: "La màquina al XIX permet la producció massiva de béns."
+  },
+  {
+    text: "Quin problema genera la mecanització segons Pevsner?",
+    options: ["Millora del gust","Substitució de l'artesania per rutina mecànica","Reducció de producció","Eliminació de mercat"],
+    correct: 1,
+    explanation: "Pevsner denuncia que la mecanització substitueix l'artesania per una rutina mecànica sense qualitat."
+  },
+  {
+    text: "Què caracteritza l'eclecticisme del segle XIX?",
+    options: ["Un únic estil pur","Barreja d'estils històrics","Eliminació de decoració","Funcionalisme estricte"],
+    correct: 1,
+    explanation: "L'eclecticisme es caracteritza per la barreja d'estils històrics diversos."
+  },
+  {
+    text: "Quin és el paper del disseny davant la crisi de formes del segle XIX?",
+    options: ["Imitar el passat","Crear noves formes adaptades","Eliminar la indústria","Tornar a l'art clàssic"],
+    correct: 1,
+    explanation: "El disseny respon a la crisi de formes creant noves formes adaptades a la producció industrial."
+  },
+  {
+    text: "Quin autor defensa la teoria social del disseny?",
+    options: ["Picasso","William Morris","Le Corbusier","Kandinsky"],
+    correct: 1,
+    explanation: "William Morris és el principal defensor de la teoria social del disseny."
+  },
+  {
+    text: "Quin objectiu tenia William Morris?",
+    options: ["Industrialitzar el disseny","Recuperar l'artesania i la qualitat","Eliminar la decoració","Crear art abstracte"],
+    correct: 1,
+    explanation: "Morris volia recuperar l'artesania medieval i la qualitat del treball manual."
+  },
+  {
+    text: "Quin era l'objectiu principal de l'Art Nouveau?",
+    options: ["Imitar els estils clàssics","Conciliar art i tècnica","Eliminar la decoració","Produir en massa sense criteri estètic"],
+    correct: 1,
+    explanation: "L'Art Nouveau volia conciliar art i tècnica en una nova estètica unificada."
+  },
+  {
+    text: "En quin període aproximat es desenvolupa l'Art Nouveau?",
+    options: ["1750–1800","1850–1870","1890–1910","1920–1940"],
+    correct: 2,
+    explanation: "L'Art Nouveau es desenvolupa aproximadament entre 1890 i 1910."
+  },
+  {
+    text: "Quina característica formal defineix l'Art Nouveau?",
+    options: ["Geometria estricta","Línies rectes","Línies sinuoses i orgàniques","Simetria absoluta"],
+    correct: 2,
+    explanation: "L'Art Nouveau es caracteritza per les línies sinuoses i orgàniques inspirades en la natura."
+  },
+  {
+    text: "Quin element és central en la iconografia de l'Art Nouveau?",
+    options: ["La màquina","La natura","L'abstracció geomètrica","L'arquitectura clàssica"],
+    correct: 1,
+    explanation: "La natura és l'element central en la iconografia de l'Art Nouveau."
+  },
+  {
+    text: "Quin altre tema recurrent és molt present en l'Art Nouveau?",
+    options: ["L'arquitectura militar","La figura femenina","La indústria pesada","La religió clàssica"],
+    correct: 1,
+    explanation: "La figura femenina és un tema molt recurrent en l'Art Nouveau."
+  },
+  {
+    text: "Com es coneix l'Art Nouveau a Alemanya?",
+    options: ["Liberty","Modernisme","Jugendstil","Secessió"],
+    correct: 2,
+    explanation: "A Alemanya l'Art Nouveau es coneix com a Jugendstil."
+  },
+  {
+    text: "Quin nom rep l'Art Nouveau a Àustria?",
+    options: ["Jugendstil","Secessió","Floreale","Modern Style"],
+    correct: 1,
+    explanation: "A Àustria l'Art Nouveau rep el nom de Secessió."
+  },
+  {
+    text: "Quina influència oriental és clau en l'Art Nouveau?",
+    options: ["Índia","Japó","Xina","Egipte"],
+    correct: 1,
+    explanation: "El japonisme és la influència oriental clau en l'Art Nouveau."
+  },
+  {
+    text: "Què aporta el japonisme al disseny europeu?",
+    options: ["Simetria absoluta","Perspectiva clàssica","Simplificació i línies planes","Ornamentació barroca"],
+    correct: 2,
+    explanation: "El japonisme aporta simplificació formal i línies planes al disseny europeu."
+  },
+  {
+    text: "Quin tipus de colors utilitza l'Art Nouveau?",
+    options: ["Foscos i degradats","Tintes planes","Exclusivament blanc i negre","Colors metàl·lics"],
+    correct: 1,
+    explanation: "L'Art Nouveau utilitza tintes planes com a recurs gràfic característic."
+  },
+  {
+    text: "Quin fenomen social impulsa l'Art Nouveau?",
+    options: ["Revolució agrícola","Societat de consum","Societat feudal","Sistema aristocràtic"],
+    correct: 1,
+    explanation: "La societat de consum burgesa és el fenomen social que impulsa l'Art Nouveau."
+  },
+  {
+    text: "Quin tipus de clients impulsen l'Art Nouveau?",
+    options: ["Classe obrera","Aristocràcia","Burgesia","Monarquia"],
+    correct: 2,
+    explanation: "La burgesia és el principal client i motor de l'Art Nouveau."
+  },
+  {
+    text: "Què diferencia l'Art Nouveau dels estils historicistes?",
+    options: ["Copia el passat","Rebutja la història com a model","Utilitza només arquitectura clàssica","Evita la decoració"],
+    correct: 1,
+    explanation: "L'Art Nouveau rebutja la història com a model i vol crear un estil nou."
+  },
+  {
+    text: "Quin arquitecte és clau en el modernisme català?",
+    options: ["Le Corbusier","Antoni Gaudí","Otto Wagner","Walter Gropius"],
+    correct: 1,
+    explanation: "Antoni Gaudí és la figura central del modernisme català."
+  },
+  {
+    text: "Quina característica tenen les formes de Gaudí?",
+    options: ["Geometria pura","Imitació clàssica","Inspiració orgànica","Minimalisme extrem"],
+    correct: 2,
+    explanation: "Les formes de Gaudí s'inspiren en la natura i tenen un caràcter orgànic."
+  },
+  {
+    text: "Què és la metamorfosi en l'Art Nouveau?",
+    options: ["Canvi de materials","Fusió entre formes naturals i objectes","Eliminació de decoració","Producció en massa"],
+    correct: 1,
+    explanation: "La metamorfosi en l'Art Nouveau és la fusió entre formes naturals i objectes dissenyats."
+  },
+  {
+    text: "Quin objectiu tenia l'Art Nouveau respecte als objectes quotidians?",
+    options: ["Fer-los només funcionals","Dignificar-los estèticament","Eliminar-los","Industrialitzar-los sense disseny"],
+    correct: 1,
+    explanation: "L'Art Nouveau volia dignificar estèticament els objectes quotidians."
+  },
+  {
+    text: "Per què l'Art Nouveau és considerat una 'moda'?",
+    options: ["Per la seva durada curta","Perquè no tenia estil","Perquè era científic","Perquè era antic"],
+    correct: 0,
+    explanation: "L'Art Nouveau és considerat una moda per la seva durada relativament curta."
+  },
+  {
+    text: "Quin problema va generar l'Art Nouveau?",
+    options: ["Falta d'innovació","Saturació i cansament estètic","Absència de clients","Poca producció"],
+    correct: 1,
+    explanation: "L'excés d'ornamentació de l'Art Nouveau va generar saturació i cansament estètic."
+  },
+  {
+    text: "Què NO va aconseguir introduir l'Art Nouveau?",
+    options: ["Disseny gràfic","Arquitectura","Sectors tecnològics avançats","Mobiliari"],
+    correct: 2,
+    explanation: "L'Art Nouveau no va aconseguir introduir-se en els sectors tecnològics avançats."
+  },
+  {
+    text: "Quin context històric acompanya el naixement de la Secessió de Viena?",
+    options: ["Expansió industrial alemanya","Decadència de l'Imperi austrohongarès","Revolució francesa","Guerra freda"],
+    correct: 1,
+    explanation: "La Secessió de Viena neix en el context de la decadència de l'Imperi austrohongarès."
+  },
+  {
+    text: "Quin objectiu tenia la Secessió de Viena?",
+    options: ["Imitar estils clàssics","Crear una nova identitat artística","Eliminar la indústria","Tornar al gòtic"],
+    correct: 1,
+    explanation: "La Secessió de Viena volia crear una nova identitat artística allunyada dels estils acadèmics."
+  },
+  {
+    text: "Quin artista lidera la Secessió de Viena?",
+    options: ["Picasso","Gustav Klimt","Kandinsky","Mondrian"],
+    correct: 1,
+    explanation: "Gustav Klimt és la figura que lidera la Secessió de Viena."
+  },
+  {
+    text: "Quin arquitecte defensa que l'historicisme és anacrònic?",
+    options: ["Gaudí","Otto Wagner","Behrens","Loos"],
+    correct: 1,
+    explanation: "Otto Wagner defensa que l'historicisme és anacrònic i proposa un nou estil."
+  },
+  {
+    text: "Segons Otto Wagner, d'on ha de sorgir el nou estil?",
+    options: ["De la història","De la religió","De les noves tecnologies i materials","De la natura"],
+    correct: 2,
+    explanation: "Wagner creu que el nou estil ha de sorgir de les noves tecnologies i materials."
+  },
+  {
+    text: "Quin estil influeix en la Secessió de Viena?",
+    options: ["Barroc","Biedermeier","Rococó","Gòtic"],
+    correct: 1,
+    explanation: "El Biedermeier té influència en la Secessió de Viena."
+  },
+  {
+    text: "Quina característica formal defineix la Secessió de Viena?",
+    options: ["Ornamentació excessiva","Geometria i simplificació","Imitació naturalista","Asimetria total"],
+    correct: 1,
+    explanation: "La Secessió de Viena es caracteritza per la geometria i la simplificació formal."
+  },
+  {
+    text: "Què significa el lema de la Secessió 'A cada època el seu art'?",
+    options: ["Copiar el passat","Adaptar l'art al present","Eliminar l'art","Tornar al classicisme"],
+    correct: 1,
+    explanation: "El lema de la Secessió defensa que cada època ha de tenir el seu propi art."
+  },
+  {
+    text: "Què eren els Wiener Werkstätte?",
+    options: ["Fàbriques industrials massives","Tallers artesanals elitistes","Museus","Empreses tecnològiques"],
+    correct: 1,
+    explanation: "Els Wiener Werkstätte eren tallers artesanals elitistes de la Secessió vienesa."
+  },
+  {
+    text: "Quin model segueixen els Wiener Werkstätte?",
+    options: ["Bauhaus","Arts & Crafts","Futurisme","Constructivisme"],
+    correct: 1,
+    explanation: "Els Wiener Werkstätte segueixen el model dels Arts & Crafts de Morris."
+  },
+  {
+    text: "Quina característica tenia la producció dels Wiener Werkstätte?",
+    options: ["Producció massiva","Alta qualitat però elitista","Baix cost","Sense disseny"],
+    correct: 1,
+    explanation: "Els Wiener Werkstätte produïen objectes d'alta qualitat però de caràcter elitista i car."
+  },
+  {
+    text: "Quin canvi conceptual es produeix després de l'Art Nouveau?",
+    options: ["De la màquina a la natura","De la natura a la màquina","De la funció a la decoració","De la indústria a l'art"],
+    correct: 1,
+    explanation: "Després de l'Art Nouveau el disseny passa de la natura com a model a la màquina."
+  },
+  {
+    text: "Qui va escriure 'Ornament i delicte'?",
+    options: ["Wagner","Loos","Klimt","Hoffmann"],
+    correct: 1,
+    explanation: "Adolf Loos va escriure 'Ornament i delicte' (1908), manifest contra la decoració."
+  },
+  {
+    text: "Quin objectiu tenia la Deutscher Werkbund?",
+    options: ["Eliminar la indústria","Donar dimensió artística a la producció","Tornar a l'artesania","Crear art abstracte"],
+    correct: 1,
+    explanation: "La Deutscher Werkbund volia donar dimensió artística a la producció industrial."
+  },
+  {
+    text: "Quin congrés és clau per la Werkbund?",
+    options: ["París 1900","Viena 1897","Colònia 1914","Londres 1851"],
+    correct: 2,
+    explanation: "El congrés de Colònia de 1914 és clau per la Deutscher Werkbund."
+  },
+  {
+    text: "Qui va treballar per AEG com a primer dissenyador corporatiu?",
+    options: ["Gaudí","Behrens","Mondrian","Klimt"],
+    correct: 1,
+    explanation: "Peter Behrens va treballar per AEG com a primer dissenyador corporatiu de la història."
+  },
+  {
+    text: "Quina característica tenen els dissenys de Behrens per AEG?",
+    options: ["Ornamentació excessiva","Geometria pura i funcionalitat","Inspiració medieval","Abstracció total"],
+    correct: 1,
+    explanation: "Els dissenys de Behrens per AEG combinen geometria pura i funcionalitat industrial."
+  },
+  {
+    text: "Què implica la normalització del producte industrial?",
+    options: ["Producció artesanal","Producció única","Estandardització","Eliminació del disseny"],
+    correct: 2,
+    explanation: "La normalització implica l'estandardització dels productes per a la producció en sèrie."
+  },
+  {
+    text: "Quina idea defensa la teoria social del disseny?",
+    options: ["El disseny no té impacte social","El disseny educa el gust de la societat","El disseny és només decoració","El disseny elimina la indústria"],
+    correct: 1,
+    explanation: "La teoria social del disseny defensa que el disseny educa el gust de la societat."
+  },
+  {
+    text: "En quin període apareixen les primeres avantguardes?",
+    options: ["1800–1850","1850–1900","1905–1925","1945–1970"],
+    correct: 2,
+    explanation: "Les primeres avantguardes artístiques apareixen entre 1905 i 1925."
+  },
+  {
+    text: "Quin paper té l'art en les avantguardes?",
+    options: ["Decoratiu","Agent de canvi social","Exclusivament religiós","Històric"],
+    correct: 1,
+    explanation: "En les avantguardes l'art és concebut com un agent de canvi social."
+  },
+  {
+    text: "Quina ciutat és el centre de les avantguardes artístiques?",
+    options: ["Berlín","Londres","París","Viena"],
+    correct: 2,
+    explanation: "París és el centre geogràfic de les avantguardes artístiques del segle XX."
+  },
+  {
+    text: "Quin origen té el terme 'avantguarda'?",
+    options: ["Artístic","Religiós","Militar","Filosòfic"],
+    correct: 2,
+    explanation: "El terme avantguarda té origen militar: designa la tropa que va davant."
+  },
+  {
+    text: "Quin fenomen històric influeix fortament en les avantguardes?",
+    options: ["Revolució agrícola","Primera Guerra Mundial","Edat Mitjana","Revolució neolítica"],
+    correct: 1,
+    explanation: "La Primera Guerra Mundial influeix profundament en el desenvolupament de les avantguardes."
+  },
+  {
+    text: "Quin canvi es produeix en l'art amb les avantguardes?",
+    options: ["De abstracte a figuratiu","De figuratiu a abstracte","De industrial a artesanal","De modern a clàssic"],
+    correct: 1,
+    explanation: "Les avantguardes produeixen un canvi de l'art figuratiu cap a l'abstracte."
+  },
+  {
+    text: "Què és l'abstracció en art?",
+    options: ["Representació realista","Eliminació de la forma","Absència de representació fidel","Decoració"],
+    correct: 2,
+    explanation: "L'abstracció és l'absència de representació fidel de la realitat."
+  },
+  {
+    text: "Què són els 'objectes d'ansietat' en les avantguardes?",
+    options: ["Objectes decoratius","Productes que generen dubte i reflexió","Objectes industrials","Obres clàssiques"],
+    correct: 1,
+    explanation: "Els objectes d'ansietat són productes que generen dubte i reflexió en l'espectador."
+  },
+  {
+    text: "Quina característica formal distingeix les avantguardes?",
+    options: ["Estabilitat","Larga durada","Evolució constant","Tradició"],
+    correct: 2,
+    explanation: "Les avantguardes es caracteritzen per l'evolució constant i el canvi permanent."
+  },
+  {
+    text: "Què és un manifest artístic?",
+    options: ["Un quadre","Una escultura","Una declaració teòrica del moviment","Un museu"],
+    correct: 2,
+    explanation: "Un manifest artístic és una declaració teòrica que exposa els principis del moviment."
+  },
+  {
+    text: "Quin és el primer moviment d'avantguarda?",
+    options: ["Cubisme","Futurisme","Fauvisme","Dadaisme"],
+    correct: 2,
+    explanation: "El Fauvisme és considerat el primer moviment d'avantguarda (1905)."
+  },
+  {
+    text: "Quina característica defineix el fauvisme?",
+    options: ["Geometria estricta","Violència cromàtica","Abstracció total","Ornamentació"],
+    correct: 1,
+    explanation: "El Fauvisme es caracteritza per la violència cromàtica i l'ús expressiu del color."
+  },
+  {
+    text: "Qui és el principal representant del fauvisme?",
+    options: ["Picasso","Kandinsky","Matisse","Mondrian"],
+    correct: 2,
+    explanation: "Henri Matisse és el principal representant del Fauvisme."
+  },
+  {
+    text: "Quin element elimina el fauvisme?",
+    options: ["Color","Llum","Perspectiva clàssica","Forma"],
+    correct: 2,
+    explanation: "El Fauvisme elimina la perspectiva clàssica per prioritzar el color."
+  },
+  {
+    text: "Quin moviment descompon la realitat en formes geomètriques?",
+    options: ["Surrealisme","Cubisme","Dadaisme","Expressionisme"],
+    correct: 1,
+    explanation: "El Cubisme descompon la realitat en formes geomètriques múltiples."
+  },
+  {
+    text: "Quin artista és clau en el cubisme?",
+    options: ["Dalí","Picasso","Klimt","Matisse"],
+    correct: 1,
+    explanation: "Pablo Picasso és la figura clau del Cubisme."
+  },
+  {
+    text: "Què fa el cubisme amb la perspectiva?",
+    options: ["La manté","La elimina o fragmenta","La reforça","La simplifica"],
+    correct: 1,
+    explanation: "El Cubisme elimina o fragmenta la perspectiva tradicional d'un sol punt de vista."
+  },
+  {
+    text: "Quin moviment exalta la velocitat i la màquina?",
+    options: ["Expressionisme","Surrealisme","Futurisme","Neoplasticisme"],
+    correct: 2,
+    explanation: "El Futurisme exalta la velocitat, la màquina i el progrés tecnològic."
+  },
+  {
+    text: "Quin moviment rebutja completament l'art tradicional?",
+    options: ["Cubisme","Dadaisme","Fauvisme","Impressionisme"],
+    correct: 1,
+    explanation: "El Dadaisme rebutja completament l'art tradicional i els seus valors."
+  },
+  {
+    text: "Què defensa el dadaisme?",
+    options: ["Ordre racional","Bellesa clàssica","L'absurd i la provocació","L'harmonia geomètrica"],
+    correct: 2,
+    explanation: "El Dadaisme defensa l'absurd i la provocació com a formes artístiques."
+  },
+  {
+    text: "Quin moviment explora somnis i subconscient?",
+    options: ["Constructivisme","Neoplasticisme","Surrealisme","Futurisme"],
+    correct: 2,
+    explanation: "El Surrealisme explora els somnis i el subconscient com a font creativa."
+  },
+  {
+    text: "Quin moviment expressa emoció subjectiva per damunt de tot?",
+    options: ["Neoplasticisme","Constructivisme","Expressionisme","Cubisme"],
+    correct: 2,
+    explanation: "L'Expressionisme expressa l'emoció subjectiva de l'artista per damunt de la realitat objectiva."
+  },
+  {
+    text: "Quin moviment utilitza formes geomètriques i colors primaris?",
+    options: ["Cubisme","Neoplasticisme","Surrealisme","Futurisme"],
+    correct: 1,
+    explanation: "El Neoplasticisme utilitza formes geomètriques pures i colors primaris."
+  },
+  {
+    text: "Qui és el principal representant del neoplasticisme?",
+    options: ["Kandinsky","Mondrian","Picasso","Dalí"],
+    correct: 1,
+    explanation: "Piet Mondrian és el principal representant del Neoplasticisme."
+  },
+  {
+    text: "Quin moviment artístic està relacionat amb la Revolució Russa?",
+    options: ["Futurisme","Constructivisme","Fauvisme","Cubisme"],
+    correct: 1,
+    explanation: "El Constructivisme és el moviment artístic vinculat a la Revolució Russa."
+  },
+  {
+    text: "Quin objectiu tenia el constructivisme?",
+    options: ["Embellir els palaus de la noblesa","Contribuir al canvi social i a la revolució","Recuperar les formes artesanals tradicionals","Promoure la religió a través de l'art"],
+    correct: 1,
+    explanation: "El Constructivisme tenia com a objectiu contribuir al canvi social i a la revolució."
+  },
+  {
+    text: "Quin color és característic del constructivisme rus?",
+    options: ["Blau","Verd","Vermell","Groc"],
+    correct: 2,
+    explanation: "El vermell és el color característic del Constructivisme rus per la seva simbologia revolucionària."
+  },
+  {
+    text: "Quina forma predomina en el constructivisme?",
+    options: ["Corba","Orgànica","Línia obliqua","Simètrica"],
+    correct: 2,
+    explanation: "La línia obliqua és la forma predominant en el Constructivisme."
+  },
+  {
+    text: "Quin canvi es produeix en el disseny al segle XX?",
+    options: ["D'un enfocament funcional a un de purament decoratiu","D'un enfocament decoratiu a un de funcional i racional","D'industrial a completament artesanal","De racional a expressió emocional"],
+    correct: 1,
+    explanation: "Al segle XX el disseny evoluciona de decoratiu a funcional."
+  },
+  {
+    text: "Quin paper té la màquina al segle XX?",
+    options: ["Força destructora que cal eliminar","Element irrellevant per al disseny","Símbol de modernitat i progrés","Simple eina decorativa"],
+    correct: 2,
+    explanation: "Al segle XX la màquina és concebuda com a símbol de modernitat i progrés."
+  },
+  {
+    text: "Quin és l'objectiu de la normalització industrial?",
+    options: ["Fomentar la màxima varietat formal","Garantir l'exclusivitat de cada peça","Estandarditzar per facilitar la producció en sèrie","Afavorir la decoració artesanal"],
+    correct: 2,
+    explanation: "La normalització industrial busca l'estandardització per facilitar la producció en sèrie."
+  },
+  {
+    text: "Quin és el paper del dissenyador modern?",
+    options: ["Decorar superficialment els productes","Crear objectes funcionals i eficients per a la producció industrial","Copiar estils artístics passats","Pintar obres d'art per a museus"],
+    correct: 1,
+    explanation: "El dissenyador modern crea objectes funcionals i eficients adaptats a la producció industrial."
+  },
+  {
+    text: "Què diferencia el disseny de l'art?",
+    options: ["El disseny té sempre una funció pràctica que l'art no requereix","L'art és sempre més complex que el disseny","El disseny no utilitza creativitat","L'art és sempre figuratiu i el disseny abstracte"],
+    correct: 0,
+    explanation: "El disseny es diferencia de l'art per la seva funció: resol problemes pràctics."
+  },
+  {
+    text: "Què implica el disseny industrial?",
+    options: ["Producció manual","Producció en sèrie i distribució","Decoració","Pintura"],
+    correct: 1,
+    explanation: "El disseny industrial implica producció en sèrie i distribució massiva."
+  },
+  {
+    text: "Quin és el paper del consumidor en la societat moderna?",
+    options: ["Receptor passiu sense capacitat d'elecció","Ciutadà amb poder de compra actiu","Agent irrellevant per al mercat","Exclusivament productor"],
+    correct: 1,
+    explanation: "El consumidor és actiu en la societat de consum, amb capacitat d'elecció."
+  },
+  {
+    text: "Quin element impulsa el consum a la societat moderna?",
+    options: ["La regulació estatal","La publicitat i el màrqueting","La filosofia moral","La tradició artesanal"],
+    correct: 1,
+    explanation: "La publicitat és l'element que impulsa el consum en la societat moderna."
+  },
+  {
+    text: "Què apareix amb la societat de consum moderna?",
+    options: ["Els tallers gremials medievals","Els mercats setmanals de pagès","Els grans magatzems i espais de venda","Els monestirs industrials"],
+    correct: 2,
+    explanation: "Amb la societat de consum apareixen els grans magatzems com a nous espais de venda."
+  },
+  {
+    text: "Quin és el repte del disseny al segle XIX?",
+    options: ["Reproduir fidelment els estils del passat","Conciliar art i indústria en una nova síntesi","Eliminar tota ornamentació","Copiar models artesanals antics"],
+    correct: 1,
+    explanation: "El repte del disseny al XIX és conciliar art i indústria en una nova síntesi."
+  },
+  {
+    text: "Per què es considera que el disseny modern neix com a resposta a la Revolució Industrial?",
+    options: ["Per eliminar la indústria","Per solucionar problemes estètics i funcionals dels productes industrials","Per copiar estils clàssics","Per substituir l'art"],
+    correct: 1,
+    explanation: "El disseny modern neix per solucionar els problemes estètics i funcionals dels productes industrials."
+  },
+  {
+    text: "Quina contradicció principal apareix al segle XIX en el disseny?",
+    options: ["Art vs religió","Forma vs funció","Art vs indústria","Natura vs tecnologia"],
+    correct: 2,
+    explanation: "La principal contradicció del XIX és entre art i indústria, entre bellesa i producció."
+  },
+  {
+    text: "Per què l'Art Nouveau no es consolida com a model industrial?",
+    options: ["Per manca de clients","Per la seva dificultat d'industrialització","Per falta d'artistes","Per excés de tecnologia"],
+    correct: 1,
+    explanation: "L'Art Nouveau no es consolida industrialment per la dificultat de reproduir els seus dissenys en sèrie."
+  },
+  {
+    text: "Quina és la diferència clau entre Arts & Crafts i Art Nouveau?",
+    options: ["Un és industrial i l'altre no","Arts & Crafts rebutja la indústria, Art Nouveau intenta integrar-la","No hi ha diferència","Art Nouveau és anterior"],
+    correct: 1,
+    explanation: "Arts & Crafts rebutja la indústria mentre que l'Art Nouveau intenta integrar-la."
+  },
+  {
+    text: "Quina evolució formal es produeix de l'Art Nouveau a la Secessió?",
+    options: ["De geometria a natura","De natura a geometria","De funció a decoració","De indústria a artesania"],
+    correct: 1,
+    explanation: "L'evolució formal va de la natura orgànica de l'Art Nouveau a la geometria de la Secessió."
+  },
+  {
+    text: "Quin és el paper de la burgesia en el desenvolupament del disseny modern?",
+    options: ["Cap","Principal motor de consum i demanda","Rebuig del disseny","Eliminació de l'art"],
+    correct: 1,
+    explanation: "La burgesia és el principal motor de consum i demanda del disseny modern."
+  },
+  {
+    text: "Quin canvi aporta el Werkbund al disseny?",
+    options: ["El retorn a les formes medievals","La integració entre art i indústria","La supressió de tot estil","L'ornament com a valor central"],
+    correct: 1,
+    explanation: "El Werkbund aporta la integració entre art i indústria com a principi fonamental."
+  },
+  {
+    text: "Quin moviment trenca més radicalment amb el passat?",
+    options: ["Impressionisme","Dadaisme","Neoclassicisme","Romanticisme"],
+    correct: 1,
+    explanation: "El Dadaisme és el moviment que trenca més radicalment amb el passat i les convencions artístiques."
+  },
+  {
+    text: "Quin moviment té més influència en el disseny industrial del segle XX?",
+    options: ["Surrealisme","Neoplasticisme","Romanticisme","Barroc"],
+    correct: 1,
+    explanation: "El Neoplasticisme és el moviment amb més influència en el disseny industrial del XX."
+  },
+  {
+    text: "Quina característica és comuna en el racionalisme?",
+    options: ["L'ornamentació com a valor positiu","L'ús de la geometria i la claredat formal","El simbolisme narratiu","L'expressió emocional subjectiva"],
+    correct: 1,
+    explanation: "La geometria és la característica comú en el racionalisme."
+  },
+  {
+    text: "Quina relació estableix el constructivisme?",
+    options: ["Entre art i espiritualitat religiosa","Entre art i indústria al servei de la societat","Entre art i natura orgànica","Entre art i tradició artesanal"],
+    correct: 1,
+    explanation: "El Constructivisme estableix una relació directa entre art i indústria."
+  },
+  {
+    text: "Quin concepte defineix millor el disseny modern?",
+    options: ["L'ornament com a valor estètic principal","La subordinació de la forma a la funció","La imitació dels estils clàssics","El simbolisme narratiu"],
+    correct: 1,
+    explanation: "La funció és el concepte que millor defineix el disseny modern."
+  },
+  {
+    text: "Quin és el paper de la publicitat en la societat de consum?",
+    options: ["Documentar la producció artesanal","Estimular el desig i impulsar les vendes","Criticar els productes industrials","Preservar els estils tradicionals"],
+    correct: 1,
+    explanation: "La publicitat té el paper d'impulsar el consum en la societat moderna."
+  },
+  {
+    text: "Quin concepte implica que el gust és una construcció social?",
+    options: ["L'objectivitat estètica universal","El relativisme cultural del gust","La jerarquia de belles arts","El funcionalisme industrial"],
+    correct: 1,
+    explanation: "El gust no és objectiu sinó una construcció social influïda per context i classe."
+  },
+  {
+    text: "Quina és la funció final del disseny?",
+    options: ["Embellir sense cap altra consideració","Resoldre problemes funcionals i estètics alhora","Reproduir estils artístics del passat","Maximitzar la producció industrial"],
+    correct: 1,
+    explanation: "La funció final del disseny és resoldre problemes funcionals i estètics alhora."
+  },
+  {
+    text: "Quina afirmació és INCORRECTA sobre l'Art Nouveau?",
+    options: ["Rebutja l'historicisme","Té influència de la natura","S'introdueix plenament en la indústria pesada","Té una durada relativament curta"],
+    correct: 2,
+    explanation: "L'Art Nouveau NO s'introdueix en la indústria pesada; és una afirmació incorrecta."
+  },
+  {
+    text: "Quina relació hi ha entre William Morris i el disseny modern?",
+    options: ["Defensa la industrialització massiva","És precursor de la teoria social del disseny","Rebutja l'art","Promou l'abstracció"],
+    correct: 1,
+    explanation: "Morris és precursor de la teoria social del disseny."
+  },
+  {
+    text: "Quina afirmació és INCORRECTA sobre el racionalisme?",
+    options: ["Prioritza la funció","Utilitza geometria","Promou ornamentació","Es relaciona amb la indústria"],
+    correct: 2,
+    explanation: "El racionalisme NO promou l'ornamentació; al contrari, la rebutja."
+  },
+  {
+    text: "Quina relació hi ha entre neoplasticisme i disseny?",
+    options: ["Decoració","Geometria i racionalitat","Simbolisme","Naturalisme"],
+    correct: 1,
+    explanation: "El neoplasticisme influeix en el disseny a través de la geometria i la racionalitat."
+  },
+  {
+    text: "Quina afirmació és INCORRECTA sobre el futurisme?",
+    options: ["Exalta la velocitat","Admira la màquina","Rebutja la tecnologia","Busca el moviment"],
+    correct: 2,
+    explanation: "El Futurisme NO rebutja la tecnologia; al contrari, la glorifica."
+  },
+  {
+    text: "Quina relació hi ha entre dadaisme i racionalitat?",
+    options: ["La defensa","La critica i la destrueix","La millora","La ignora"],
+    correct: 1,
+    explanation: "El Dadaisme critica i destrueix la racionalitat com a valor dominant."
+  },
+  {
+    text: "Quina afirmació és INCORRECTA sobre el constructivisme?",
+    options: ["Té objectiu social","Està vinculat a Rússia","Prioritza la decoració","Relaciona art i indústria"],
+    correct: 2,
+    explanation: "El Constructivisme NO prioritza la decoració; és funcional i social."
+  },
+  {
+    text: "Quina és la millor definició de funcionalisme?",
+    options: ["L'ornament com a expressió de l'artista","La forma subordinada estrictament a la funció","El simbolisme com a guia del disseny","La reproducció de tradicions culturals"],
+    correct: 1,
+    explanation: "El funcionalisme es defineix com la subordinació de la forma a la funció."
+  },
+  {
+    text: "Quin problema genera la producció en massa?",
+    options: ["Una qualitat molt alta i homogènia","Mal gust estètic i imitació superficial dels estils","L'exclusivitat excessiva dels productes","Una funcionalitat deficient"],
+    correct: 1,
+    explanation: "La producció en massa genera mal gust estètic i imitació superficial dels estils."
+  },
+  {
+    text: "Quina afirmació és INCORRECTA sobre Arts & Crafts?",
+    options: ["Defensa l'artesania","Rebutja la indústria","Promou producció massiva","Valora la qualitat"],
+    correct: 2,
+    explanation: "Arts & Crafts NO promou la producció massiva; defensa l'artesania i el treball manual."
+  },
+  {
+    text: "Quina relació hi ha entre Art Nouveau i Arts & Crafts?",
+    options: ["Són oposats totalment","Art Nouveau deriva en part d'Arts & Crafts","No tenen relació","Arts & Crafts és posterior"],
+    correct: 1,
+    explanation: "L'Art Nouveau deriva en part de l'Arts & Crafts, ambdós reaccionen a la industrialització."
+  },
+  {
+    text: "Quin moviment defensa més l'artesania?",
+    options: ["Futurisme","Arts & Crafts","Constructivisme","Cubisme"],
+    correct: 1,
+    explanation: "Arts & Crafts és el moviment que defensa l'artesania com a valor principal."
+  },
+  {
+    text: "Quin moviment est vinculat a la màquina?",
+    options: ["Romanticisme","Futurisme","Gòtic","Barroc"],
+    correct: 1,
+    explanation: "El Futurisme és el moviment més vinculat a la màquina i la tecnologia."
+  },
+  {
+    text: "Quin moviment es basa en la natura com a font principal?",
+    options: ["Constructivisme","Art Nouveau","Neoplasticisme","Cubisme"],
+    correct: 1,
+    explanation: "L'Art Nouveau es basa en la natura com a font principal d'inspiració."
+  },
+  {
+    text: "Quin moviment té influència japonesa directa?",
+    options: ["Cubisme","Art Nouveau","Futurisme","Expressionisme"],
+    correct: 1,
+    explanation: "L'Art Nouveau té influència japonesa directa a través del japonisme."
+  },
+  {
+    text: "Quin moviment és el més racional?",
+    options: ["Surrealisme","Neoplasticisme","Romanticisme","Dadaisme"],
+    correct: 1,
+    explanation: "El Neoplasticisme és el moviment més racional, basat en geometria pura i ordre."
+  },
+  {
+    text: "Quin moviment és el més emocional?",
+    options: ["Expressionisme","Constructivisme","Neoplasticisme","Racionalisme"],
+    correct: 0,
+    explanation: "L'Expressionisme és el moviment més emocional, centrat en l'expressió subjectiva."
+  },
+  {
+    text: "Quin moviment és el més irracional?",
+    options: ["Dadaisme","Cubisme","Neoplasticisme","Constructivisme"],
+    correct: 0,
+    explanation: "El Dadaisme és el moviment més irracional, basant-se en l'absurd i el caos."
+  },
+  {
+    text: "Quin moviment és el més decoratiu?",
+    options: ["Art Nouveau","Racionalisme","Neoplasticisme","Constructivisme"],
+    correct: 0,
+    explanation: "L'Art Nouveau és el moviment més decoratiu, caracteritzat per l'ornamentació orgànica."
+  },
+  {
+    text: "Quin moviment és el més funcional?",
+    options: ["Art Nouveau","Racionalisme","Romanticisme","Surrealisme"],
+    correct: 1,
+    explanation: "El Racionalisme és el moviment més funcional, prioritzant la funció per damunt de tot."
+  },
+  {
+    text: "Quin moviment és el més abstracte?",
+    options: ["Neoplasticisme","Art Nouveau","Romanticisme","Barroc"],
+    correct: 0,
+    explanation: "El Neoplasticisme és el moviment més abstracte, amb formes geomètriques pures."
+  },
+  {
+    text: "Quin moviment és el més simbòlic?",
+    options: ["Surrealisme","Constructivisme","Racionalisme","Funcionalisme"],
+    correct: 0,
+    explanation: "El Surrealisme és el moviment més simbòlic, explorant el subconscient i el somni."
+  },
+  {
+    text: "Quin moviment és el més industrial?",
+    options: ["Constructivisme","Romanticisme","Art Nouveau","Gòtic"],
+    correct: 0,
+    explanation: "El Constructivisme és el moviment més industrial, vinculant art i producció."
+  },
+  {
+    text: "Quin moviment és el més artesanal?",
+    options: ["Arts & Crafts","Constructivisme","Futurisme","Cubisme"],
+    correct: 0,
+    explanation: "Arts & Crafts és el moviment més artesanal, defensant el treball manual."
+  },
+  {
+    text: "Quin element és clau en el disseny modern?",
+    options: ["L'ornament com a qualitat principal","La funció com a criteri fonamental","El simbolisme religiós","La narrativa històrica"],
+    correct: 1,
+    explanation: "La funció és l'element clau en el disseny modern."
+  },
+  {
+    text: "Quin és l'objectiu final del disseny?",
+    options: ["Ornamentar els objectes sense criteri funcional","Integrar funció i estètica en una síntesi coherent","Produir el màxim nombre d'unitats possibles","Innovar per innovar sense propòsit clar"],
+    correct: 1,
+    explanation: "L'objectiu final del disseny és integrar funció i estètica en una síntesi coherent."
+  }
+];
+
+const QUIZ_SIZE = 85;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Shuffle answer options while keeping track of the correct one
+function shuffleOptions(q) {
+  const indices = [0, 1, 2, 3].slice(0, q.options.length);
+  const shuffledIndices = shuffle(indices);
+  const newOptions = shuffledIndices.map(i => q.options[i]);
+  const newCorrect = shuffledIndices.indexOf(q.correct);
+  return { ...q, options: newOptions, correct: newCorrect };
+}
+
+let QUESTIONS = [];
+let currentMode = 85;
+const LETTERS = ['a','b','c','d'];
+
+let current = 0;
+let answers = [];
+let answered = [];
+
+function startQuiz(size) {
+  currentMode = size;
+  const raw = shuffle(ALL_QUESTIONS).slice(0, size);
+  QUESTIONS = raw.map(shuffleOptions);
+  current = 0;
+  answers = new Array(QUESTIONS.length).fill(null);
+  answered = new Array(QUESTIONS.length).fill(false);
+
+  document.getElementById('mode-screen').style.display = 'none';
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('header-total').textContent = size + ' / ' + ALL_QUESTIONS.length;
+
+  buildMinimap();
+  renderQuestion();
+  updateScoreboard();
+}
+
+function goToModeSelect() {
+  document.getElementById('results-panel').classList.remove('show');
+  document.getElementById('q-card').style.display = 'block';
+  document.getElementById('minimap').style.display = 'flex';
+  document.querySelector('.scoreboard').style.display = 'grid';
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('mode-screen').style.display = 'block';
+}
+
+function buildMinimap() {
+  const mm = document.getElementById('minimap');
+  mm.innerHTML = '';
+  QUESTIONS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'mm-dot';
+    d.title = 'Pregunta ' + (i+1);
+    d.onclick = () => goTo(i);
+    mm.appendChild(d);
+  });
+  updateMinimap();
+}
+
+function updateMinimap() {
+  const dots = document.querySelectorAll('.mm-dot');
+  dots.forEach((d, i) => {
+    d.className = 'mm-dot';
+    if (answered[i]) {
+      d.classList.add(answers[i] === QUESTIONS[i].correct ? 'answered-ok' : 'answered-err');
+    }
+    if (i === current) d.classList.add('current');
+  });
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-num').textContent =
+    String(current+1).padStart(2,'0') + ' / ' + QUESTIONS.length;
+  document.getElementById('q-text').textContent = q.text;
+
+  const imgWrap = document.getElementById('q-img-wrap');
+  if (q.image) {
+    imgWrap.style.display = 'block';
+    const imgEl = document.getElementById('q-img');
+    imgEl.crossOrigin = 'anonymous';
+    imgEl.alt = q.caption || '';
+    imgEl.onerror = function() {
+      // If Special:FilePath fails, try the direct upload URL as fallback
+      if (!this.src.includes('upload.wikimedia.org')) {
+        const filename = this.src.split('FilePath/')[1]?.split('?')[0];
+        if (filename) {
+          this.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/' + filename;
+        }
+      } else {
+        // Show a placeholder
+        this.style.display = 'none';
+        imgWrap.querySelector('.q-caption').textContent = '⚠ Imatge no disponible en mode local. ' + (q.caption || '');
+      }
+    };
+    imgEl.src = q.image;
+    document.getElementById('q-caption').textContent = q.caption || '';
+  } else {
+    imgWrap.style.display = 'none';
+  }
+
+  const optEl = document.getElementById('options');
+  optEl.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-letter">${LETTERS[i]}</span><span class="opt-text">${opt}</span>`;
+    btn.onclick = () => selectAnswer(i);
+    if (answered[current]) {
+      btn.disabled = true;
+      if (i === q.correct) btn.classList.add('correct-ans');
+      if (answers[current] === i && answers[current] !== q.correct) btn.classList.add('wrong-ans');
+    }
+    optEl.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  if (answered[current]) {
+    const ok = answers[current] === q.correct;
+    fb.className = 'feedback show';
+    document.getElementById('fb-icon').textContent = ok ? 'OK' : 'NO';
+    document.getElementById('fb-icon').className = 'feedback-icon ' + (ok ? 'ok' : 'err');
+    document.getElementById('fb-text').textContent =
+      (ok ? 'Correcte. ' : 'Incorrecte. La resposta correcta és "' + q.options[q.correct] + '". ') + q.explanation;
+  } else {
+    fb.className = 'feedback';
+  }
+
+  document.getElementById('btn-prev').disabled = current === 0;
+
+  const allAnswered = answered.every(Boolean);
+  const nextBtn = document.getElementById('btn-next');
+  if (current === QUESTIONS.length - 1 && allAnswered) {
+    nextBtn.textContent = 'Veure resultats →';
+    nextBtn.onclick = showResults;
+    nextBtn.className = 'nav-btn primary';
+    nextBtn.disabled = false;
+  } else if (current === QUESTIONS.length - 1) {
+    nextBtn.textContent = 'Última pregunta';
+    nextBtn.disabled = true;
+    nextBtn.onclick = null;
+  } else {
+    nextBtn.textContent = 'Següent →';
+    nextBtn.disabled = false;
+    nextBtn.onclick = () => navigate(1);
+    nextBtn.className = 'nav-btn primary';
+  }
+
+  updateMinimap();
+  updateScoreboard();
+}
+
+function selectAnswer(idx) {
+  if (answered[current]) return;
+  answers[current] = idx;
+  answered[current] = true;
+  renderQuestion();
+
+  const isCorrect = idx === QUESTIONS[current].correct;
+  if (isCorrect && current < QUESTIONS.length - 1) {
+    setTimeout(() => { current++; renderQuestion(); }, 700);
+  }
+}
+
+function navigate(dir) {
+  const next = current + dir;
+  if (next >= 0 && next < QUESTIONS.length) {
+    current = next;
+    renderQuestion();
+  }
+}
+
+function goTo(i) {
+  current = i;
+  renderQuestion();
+}
+
+function updateScoreboard() {
+  const total = QUESTIONS.length;
+  const done = answered.filter(Boolean).length;
+  const correct = answers.filter((a, i) => answered[i] && a === QUESTIONS[i].correct).length;
+  const wrong = done - correct;
+  const pct = done > 0 ? Math.round((correct / done) * 100) : null;
+  const rawScore = correct * 1 - wrong * 0.5;
+  const nota = done > 0 ? Math.max(0, (rawScore / total) * 10).toFixed(2) : null;
+
+  document.getElementById('sc-ok').textContent = correct;
+  document.getElementById('sc-err').textContent = wrong;
+  document.getElementById('sc-rem').textContent = total - done;
+  document.getElementById('sc-pct').textContent = pct !== null ? pct + '%' : '—';
+  document.getElementById('sc-nota').textContent = nota !== null ? nota : '—';
+}
+
+function showResults() {
+  document.getElementById('q-card').style.display = 'none';
+  document.getElementById('minimap').style.display = 'none';
+  document.querySelector('.scoreboard').style.display = 'none';
+  const panel = document.getElementById('results-panel');
+  panel.classList.add('show');
+
+  const total = QUESTIONS.length;
+  const correct = answers.filter((a, i) => a === QUESTIONS[i].correct).length;
+  const wrong = total - correct;
+  const pct = Math.round((correct / total) * 100);
+  const rawScore = correct * 1 - wrong * 0.5;
+  const nota = Math.max(0, (rawScore / total) * 10).toFixed(2);
+
+  document.getElementById('res-score').textContent = pct + '%  ·  ' + nota + ' / 10';
+  document.getElementById('res-ok').textContent = correct;
+  document.getElementById('res-err').textContent = wrong;
+  document.getElementById('res-pts').textContent = Math.max(0, rawScore).toFixed(1);
+
+  let grade = '';
+  const n = parseFloat(nota);
+  if (n >= 9) grade = 'Excel·lent — domini alt del temari.';
+  else if (n >= 7) grade = 'Bé — algunes àrees a repassar.';
+  else if (n >= 5) grade = 'Suficient — cal reforçar conceptes.';
+  else grade = 'Insuficient — repassa el material.';
+  document.getElementById('res-grade').textContent = grade;
+
+  const review = document.getElementById('res-review');
+  const wrongItems = QUESTIONS.map((q, i) => ({q, i})).filter(({q, i}) => answers[i] !== q.correct);
+
+  if (wrongItems.length === 0) { review.innerHTML = ''; return; }
+
+  let html = '<div class="res-review-title">Preguntes incorrectes (' + wrongItems.length + ')</div>';
+  wrongItems.forEach(({q, i}) => {
+    html += `<div class="review-item">
+      <div class="review-num">${String(i+1).padStart(2,'0')}</div>
+      <div>
+        <div class="review-q">${q.text.length > 70 ? q.text.substring(0,70)+'\u2026' : q.text}</div>
+        <div class="review-ans">Correcta: <span>${q.options[q.correct]}</span></div>
+      </div>
+    </div>`;
+  });
+  review.innerHTML = html;
+}
+
+function restart() {
+  const raw = shuffle(ALL_QUESTIONS).slice(0, currentMode);
+  QUESTIONS = raw.map(shuffleOptions);
+  current = 0;
+  answers = new Array(QUESTIONS.length).fill(null);
+  answered = new Array(QUESTIONS.length).fill(false);
+  document.getElementById('q-card').style.display = 'block';
+  document.getElementById('minimap').style.display = 'flex';
+  document.querySelector('.scoreboard').style.display = 'grid';
+  document.getElementById('results-panel').classList.remove('show');
+  buildMinimap();
+  renderQuestion();
+  updateScoreboard();
+}
+
+// Start on mode selection — don't auto-start
+
+</script>
+</body>
+</html>
