@@ -175,18 +175,23 @@
     flex-wrap: nowrap;
     padding: 0;
     border-bottom: 1px solid var(--black);
-    gap: 12px;
+    gap: 0;
     align-items: flex-end;
   }
 
   .q-image {
-    width: 280px;
-    height: 200px;
+    min-width: 160px;
+    max-width: 320px;
+    min-height: 120px;
+    max-height: 260px;
+    width: auto;
+    height: auto;
     border: 1px solid var(--gray-200);
     filter: grayscale(20%);
     margin: 0;
     flex-shrink: 0;
-    object-fit: cover;
+    display: block;
+    object-fit: contain;
   }
 
   .q-caption {
@@ -194,9 +199,11 @@
     font-size: 10px;
     color: var(--gray-400);
     letter-spacing: 0.03em;
-    margin-left: auto;
-    padding: 0 20px 12px 0;
-    white-space: nowrap;
+    padding: 0 20px 8px 12px;
+    white-space: normal;
+    align-self: flex-end;
+    max-width: 180px;
+    line-height: 1.4;
   }
 
   /* OPTIONS */
@@ -563,11 +570,11 @@
   <div id="mode-screen">
     <header>
       <div>
-        <div class="header-label">Parcial — Estètica i Disseny</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+          <div class="header-label" style="margin-bottom:0;">Parcial — Estètica i Disseny</div>
+          <div class="header-label" style="margin-bottom:0;">David Martínez Gregorio</div>
+        </div>
         <h1>Tria el mode<br>de pràctica</h1>
-      </div>
-      <div style="text-align:right;">
-        <div class="header-label">David Martínez Gregorio</div>
       </div>
     </header>
 
